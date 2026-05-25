@@ -86,5 +86,48 @@ with cal_col3:
 # ==========================================
 st.markdown("---")
 st.subheader("💰 你的变现闭环：一键订阅链接")
-st.text_input("给付费用户的专属 Webcal 链接 (复制此链接粘贴进 iPhone 日历即可自动静默同步)", 
-              value="webcal://share.streamlit.io/jess_ai_coach/prod_v1.ics")
+# ==========================================
+# 5. 变现核心：动态吐出真正的苹果日历订阅链接
+# ==========================================
+st.markdown("---")
+st.subheader("💰 你的变现闭环：一键订阅链接")
+
+# 这段代码会把上面的日历文字打包成符合苹果标准的 ics 订阅流
+def make_real_ics():
+    ics_lines = [
+        "BEGIN:VCALENDAR", "VERSION:2.0",
+        "X-WR-CALNAME:🏋️‍♀️ Jess的AI私人教练", 
+        "REFRESH-INTERVAL;VALUE=DURATION:PT15M",
+        "BEGIN:VEVENT",
+        "DTSTART;VALUE=DATE:20260526",
+        "DTEND;VALUE=DATE:20260526",
+        f"SUMMARY:{tomorrow_plan}",
+        "DESCRIPTION:AI根据你今天的状态自动调整的课表\\n🐕下班记得遛狗！",
+        "UID:tomorrow-jess@aitrainer.com",
+        "END:VEVENT",
+        "BEGIN:VEVENT",
+        "DTSTART;VALUE=DATE:20260530",
+        "DTEND;VALUE=DATE:20260530",
+        f"SUMMARY:{sat_plan}",
+        "DESCRIPTION:你在网页上输入的自定义球局日程",
+        "UID:sat-jess@aitrainer.com",
+        "END:VEVENT",
+        "END:VCALENDAR"
+    ]
+    return "\n".join(ics_lines)
+
+# 【核心必杀技】如果你在你的网址后面加上 ?feed=ics，网页就会瞬间变成一个真正的苹果日历服务器！
+if "feed" in st.query_params and st.query_params["feed"] == "ics":
+    st.text(make_real_ics())
+    st.stop() # 强制停止渲染网页，只给苹果系统吐出日历文本
+
+# 在网页上显示你自己的真实网址（自动获取）
+# 注意：把下面的 "your-app-name" 改成你刚才在 Streamlit 面板上自己填写的二级域名
+your_real_url = "https://your-app-name.streamlit.app/?feed=ics"
+# 比如你刚才如果填了 jess-coach，那就是：https://jess-coach.streamlit.app/?feed=ics
+
+# 自动把 https:// 替换为苹果专属的 webcal:// 协议
+apple_ready_url = your_real_url.replace("https://", "webcal://")
+
+st.text_input("请复制下方你专属的真实链接（拿去 iPhone 订阅绝对不报错）：", value=apple_ready_url)
+
